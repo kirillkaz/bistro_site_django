@@ -1,0 +1,14 @@
+{%load static%}
+<!doctype html>
+<html>
+    <head>
+    </head>
+
+    <body>
+	<h1>Auth Success!</h1>
+	{{ form.as_p }}
+
+	Здравствуйте {{ request.user.login }}
+	Ваша роль {{ request.user.position }}
+    </body>
+</html>

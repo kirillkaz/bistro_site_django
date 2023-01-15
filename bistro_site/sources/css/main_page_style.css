@@ -141,14 +141,14 @@ body {
     display: flex;
     flex-direction: column;
     margin-left: 2.5%;
-    width: 50%;
+    width: 94%;
 }
 
 .description{
     font-family: 'Montserrat', 'Arial';
     font-size: 28px;
     font-weight: bold;
-    width:471px;
+    width:100%;
     color: #E8E8E8;
 }
 
@@ -158,7 +158,65 @@ body {
     padding-right:20px;
 }
 
-.add_field .input_field{
+.add_field .input_image{
+    display: none;
+}
+
+.input_field-img-icon{
+    transition: 0.2s;
+    opacity: 0.25;
+    width: 200px;
+    height: 200px;
+}
+
+.table_img{
+    width: 200px;
+    height: 200px;
+}
+
+.input_field-img-icon:hover{
+    transition: 0.2s;
+    opacity: 0.5;
+    width: 200px;
+    height: 200px;
+}
+
+.loaded_img{
+    opacity: 1;
+    width: 200px;
+    height: 200px;
+}
+
+.add_field .input_field_area{
+    min-width: 100%;
+    background-color: #4C5767;
+    color: #E8E8E8;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    outline: none;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    max-height: 150px;
+    resize: none;
+}
+
+.add_field .input_field_area::placeholder{
+    min-width: 100%;
+    background-color: #4C5767;
+    color: #8691A1;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    outline: none;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    max-height: 150px;
+    resize: none;
+}
+
+
+.add_field .input_field::placeholder{
     width: 100%;
     background-color: #4C5767;
     color: #8691A1;
@@ -169,6 +227,31 @@ body {
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
 }
+.add_field .input_field{
+    width: 100%;
+    background-color: #4C5767;
+    color: #E8E8E8;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    outline: none;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+}
+
+.add_field .readonly_field{
+    width: 100%;
+    opacity: 0.5;
+    background-color: #3e4755;
+    color: #E8E8E8;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    outline: none;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+}
+
 
 .records{
     display: flex;
@@ -176,9 +259,144 @@ body {
     margin-top:20px;
     max-height: 80vh;
     padding-left: 10px;
-    padding-right: 10px;
     border: 2px solid #243143;
     overflow: scroll;
+    width:75vw;
+}
+
+.table_block{
+    max-height: 600px;
+    overflow: scroll;
+}
+
+table{
+    margin-top: 20px;
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border-color: #243143;
+    border-width: medium;
+    text-align: center;
+    color: #E8E8E8;
+    font-family: 'Montserrat', 'Arial';
+    overflow: scroll;
+}
+
+tr:nth-child(even) {
+    background-color: #343F4F
+}
+
+tr:nth-child(even):hover {
+    background-color: #323D4D
+}
+
+tr:nth-child(2n+1){
+    background-color: #3B4759;
+}
+
+tr:nth-child(2n+1):hover{
+    background-color: #394557;
+}
+
+.last_td{
+    width: 20%;
+}
+
+td{
+    height: 50px;
+}
+
+.td_area{
+    display: flex;
+    text-align: justify;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.main_td_area{
+    width: 40%;
+}
+
+table .save{
+    transition: 0.5s;
+    color: #E8E8E8;
+    background-color: #155CC6;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
+}
+
+table .save:hover{
+    transition: 0.5s;
+    color: #155CC6;
+    background-color: #E8E8E8;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
+}
+
+table .save:active{
+    color: #155CC6;
+    background-color: grey;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
+}
+
+table .reset{
+    transition: 0.5s;
+    color: #E8E8E8;
+    background-color: #C61515;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
+}
+
+table .reset:hover{
+    transition: 0.5s;
+    color: #C61515;
+    background-color: #E8E8E8;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
+}
+
+table .reset:active{
+    color: #C61515;
+    background-color: grey;
+    border: none;
+    border-radius: 7px;
+    font-family: 'Montserrat', 'Arial';
+    font-size: 18px;
+    width: 85%;
+    height: 70%;
+    padding: 10px;
+    line-height: 0em;
 }
 
 .records hr{
@@ -190,7 +408,6 @@ body {
     flex-direction: column;
     color: #E8E8E8;
     font-family: 'Montserrat', 'Arial';
-    border-bottom: 2px solid #243143;
 }
 
 .record_item{
@@ -200,12 +417,22 @@ body {
 .buttons{
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
+    text-decoration: none;
+    margin-top: 8vh;
+    width: 99%;
+}
+
+.button{
+    display: flex;
+    flex-direction: row;
     justify-content: center;
+    text-decoration: none;
     margin-top: 8vh;
     width: 100%;
 }
 
-.buttons .reset{
+.reset{
     transition: 0.5s;
     color: #E8E8E8;
     background-color: #C61515;
@@ -218,7 +445,7 @@ body {
     padding: 10px;
 }
 
-.buttons .reset:hover{
+.reset:hover{
     transition: 0.5s;
     color: #C61515;
     background-color: #E8E8E8;
@@ -231,7 +458,7 @@ body {
     padding: 10px;
 }
 
-.buttons .reset:active{
+.reset:active{
     color: #C61515;
     background-color: grey;
     border: none;
@@ -243,8 +470,7 @@ body {
     padding: 10px;
 }
 
-.buttons .save{
-    margin-left: 10px;
+.save{
     transition: 0.5s;
     color: #E8E8E8;
     background-color: #155CC6;
@@ -257,7 +483,7 @@ body {
     padding: 10px;
 }
 
-.buttons .save:hover{
+.save:hover{
     transition: 0.5s;
     color: #155CC6;
     background-color: #E8E8E8;
@@ -270,7 +496,7 @@ body {
     padding: 10px;
 }
 
-.buttons .save:active{
+.save:active{
     color: #155CC6;
     background-color: grey;
     border: none;
@@ -280,6 +506,10 @@ body {
     width: 33.33%;
     height: 100%;
     padding: 10px; 
+}
+
+.hidden{
+    display:none;
 }
 
 input[type=number]::-webkit-inner-spin-button,

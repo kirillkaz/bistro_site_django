@@ -1,0 +1,74 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+	    <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
+    </head>
+
+    <body>
+ 	<div class="menu">
+
+            <div class="menu_text bistro_text">Бистро</div>
+            {%if request.user.position == "Шеф-повар"%}
+                {%include "main_app/shef.html"%}
+            {%elif request.user.position == "Кассир"%}
+                {%include "main_app/seller.html"%}
+            {%elif request.user.position == "Руководитель склада"%}
+                {%include "main_app/stock_manager.html"%}
+            {%elif request.user.position == "Бухгалтер"%}
+                {%include "main_app/accountant.html"%}
+            {%endif%}
+        </div>
+
+      <div class="main_block">
+            <div class="header">
+                <div>Контакты</div>
+                <div>О нас</div>
+                <div>Выход</div>
+            </div>
+            <hr>
+            
+	    {%if request.user.position != "Руководитель склада"%}
+	    <div class="welcome">Доступ запрещен!</div>
+
+	    {%else%}
+            <div class="interact_block">
+                <div class="description">
+                    Просмотр продукта питания
+                </div>
+
+                <form>
+                    <table>
+                        <tr>
+                            <td>id</td>
+                            <td>Название</td>
+                            <td>Вес</td>
+                            <td>Калорийность</td>
+                            <td>Стоимость</td>
+                            <td class="last_td"></td>
+                        </tr>
+                    </table>
+                    <div class="table_block">
+                        <table>
+			{%for i in products%}
+			 <tr>
+			    <td>{{i.id}}</td>
+			    <td>{{i.name}}</td>
+			    <td>{{i.weight}}гр</td>
+			    <td>{{i.calories}}кал</td>
+			    <td>{{i.price}}р</td>
+			    <td class="last_td"><a href="http://146.185.240.26/hub/edit/product?prodID={{i.id}}"><input type="button" class="save" value="редактировать"></a></td>
+                        </tr>
+			{%endfor%}
+                        </table>
+                    </div>
+                </form>
+                </div>
+            </div>
+	    {%endif%}
+        </div>
+    </body>
+
+    <footer>
+    </footer>
+</html>

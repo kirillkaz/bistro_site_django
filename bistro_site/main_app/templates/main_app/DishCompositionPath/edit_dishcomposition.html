@@ -2,12 +2,12 @@
 <!DOCTYPE html>
 <html>
     <head>
-	    <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
+            <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
     </head>
 
     <body>
- 	<div class="menu">
-
+       <div class="menu">
+                
             <div class="menu_text bistro_text">Бистро</div>
             {%if request.user.position == "Шеф-повар"%}
                 {%include "main_app/shef.html"%}
@@ -20,44 +20,40 @@
             {%endif%}
         </div>
 
-        <div class="main_block">
+	<div class="main_block">
             <div class="header">
                 <div>Контакты</div>
                 <div>О нас</div>
                 <div>Выход</div>
             </div>
             <hr>
-            
+            {%if request.user.position != "Шеф-повар"%}
+            <div class="welcome">Доступ запрещен!</div>
+            {%else%}
             <div class="interact_block">
                 <div class="description">
-                    Просмотр продуктов питания
+			Редактирование {{product_name}} в составе {{cur_dish.id.name}}
                 </div>
-
-                <div class="records">
-		    {%for i in products%}
-		    <div class="record">
-			<div class="record_item">
-			    id: {{i.id}}
-			</div>
-			<div class="record_item">
-			    Название: {{i.name}}
-			</div>
-			<div class="record_item">
-			    Вес: {{i.weight}}гр
-			</div>
-			<div class="record_item">
-			    Калорийность: {{i.calories}}Кал
-			</div>
-			<div class="record_item">
-			    Цена: {{i.price}}р
-			</div>
-		    </div>
-		    {%endfor%}
-                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="add_field">
+			    <input type="text" class="input_image" id="id_name" name="name" value="{{cur_dish.id.name}}">
+                    </div>
+                    <div class="add_field">
+                        {{form.product_count}}
+                    </div>
+                    <span>{{ error }}</span>
+                    <div class="button">
+                        <input type="submit" value="Сохранить" class="save">
+                    </div>
+                </form>
             </div>
+            {%endif%}
         </div>
+
     </body>
 
     <footer>
     </footer>
 </html>
+

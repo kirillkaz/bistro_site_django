@@ -1,5 +1,14 @@
 from django import forms
-from .models import recipe, dish, product, DishComposition, DailyReport
+from .models import recipe, dish, product,DishComposition, DailyReport
+
+
+class DishCompositionForm(forms.ModelForm):
+    name = forms.CharField(label='Название продукта', widget=forms.TextInput(attrs={'placeholder': 'Название продукта', 'class': 'input_field'}))
+    product_count = forms.IntegerField(label='Количество', widget=forms.TextInput(attrs={'placeholder': 'Количество', 'class': 'input_field'}))
+
+    class Meta:
+        model = DishComposition
+        fields = ('name', 'product_count')
 
 
 class ProductForm(forms.ModelForm):
@@ -12,11 +21,21 @@ class ProductForm(forms.ModelForm):
         model = product
         fields = ('name', 'weight', 'calories', 'price')
 
+
+class RecipeForm(forms.ModelForm):
+    name = forms.CharField(label='Название рецепта', widget=forms.TextInput(attrs={'placeholder': 'Название рецепта', 'class': 'input_field'}))
+    cooking_time = forms.CharField(label='Время приготовления', widget=forms.TextInput(attrs={'placeholder': 'Время приготовления', 'class': 'input_field'}))
+    cooking_technology = forms.CharField(label='Технология приготовления', widget=forms.Textarea(attrs={'placeholder': 'Технология приготовления', 'class': 'input_field_area'}))
+    
+    class Meta:
+        model = recipe
+        fields = ('name', 'cooking_time', 'cooking_technology')
+
 class DishForm(forms.ModelForm):
-    id = forms.IntegerField(label='Номер блюда')
-    type = forms.CharField(label='Тип блюда')
-    img = forms.ImageField(label='Картинка')
+    name = forms.CharField(label='Название блюда', widget=forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'input_field'}))
+    type = forms.CharField(label='Тип блюда', widget=forms.TextInput(attrs={'placeholder': 'Тип блюда', 'class': 'input_field'}))
+    img = forms.ImageField(label='Картинка', widget=forms.FileInput(attrs={'class': 'input_image', 'accept': 'image/', 'onchange': 'download(this)'}))
 
     class Meta:
         model = dish
-        fields = ('id', 'type', 'img')
+        fields = ('name', 'type', 'img')

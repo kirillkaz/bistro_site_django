@@ -1,0 +1,69 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+            <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
+    </head>
+
+    <body>
+       <div class="menu">
+
+            <div class="menu_text bistro_text">Бистро</div>
+            {%if request.user.position == "Шеф-повар"%}
+                {%include "main_app/shef.html"%}
+            {%elif request.user.position == "Кассир"%}
+                {%include "main_app/seller.html"%}
+            {%elif request.user.position == "Руководитель склада"%}
+                {%include "main_app/stock_manager.html"%}
+            {%elif request.user.position == "Бухгалтер"%}
+                {%include "main_app/accountant.html"%}
+            {%endif%}
+        </div>
+
+	<div class="main_block">
+            <div class="header">
+                <div>Контакты</div>
+                <div>О нас</div>
+                <div>Выход</div>
+            </div>
+            <hr>
+            {%if request.user.position != "Шеф-повар"%}
+            <div class="welcome">Доступ запрещен!</div>
+            {%else%}
+            <div class="interact_block">
+                <div class="description">
+                    Добавление блюда
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="add_field">
+                        {{form.name}}
+                    </div>
+                    <div class="add_field">
+                        {{form.img}}
+			<label for="id_img">
+                            <span class="input_field-img-icon-wrapper">
+                                <img class="input_field-img-icon" src="https://cdn-icons-png.flaticon.com/128/5730/5730886.png" alt="Выбрать файл">
+				<script src="{%static 'scripts/img_script.js'%}"></script>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="add_field">
+                        {{form.type}}
+                    </div>
+                    <span>{{ error }}</span>
+                    <div class="button">
+                        <input type="submit" value="Сохранить" class="save">
+                    </div>
+                </form>
+            </div>
+            {%endif%}
+        </div>
+
+    </body>
+
+    <footer>
+    </footer>
+</html>
+

@@ -3,16 +3,13 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class dish(models.Model):
-    id = models.IntegerField(
+    id = models.ForeignKey(
+            'recipe',
             primary_key=True,
-            validators=[MinValueValidator(1), MaxValueValidator(1000)]
+            on_delete=models.PROTECT
             )
-    type = models.CharField(max_length=10)
-    img = models.ImageField(
-            upload_to='test', 
-            height_field=256,
-            width_field=256
-            )
+    type = models.CharField(max_length=100)
+    img = models.ImageField(upload_to='media/images')
 
 
 class product(models.Model):
@@ -37,12 +34,12 @@ class recipe(models.Model):
 
 
 class DishComposition(models.Model):
-    dish_id = models.IntegerField(
-            primary_key=True,
-            validators=[MinValueValidator(1), MaxValueValidator(1000)]
-            )
-    product_id = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100000)])
+    record_id = models.IntegerField(validators=[MinValueValidator(1)], primary_key=True)
+    dish = models.ForeignKey('dish', on_delete=models.CASCADE)
+    product = models.ForeignKey('product', on_delete=models.CASCADE)
     product_count = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100)])
+
+
 
 
 class DailyReport(models.Model):

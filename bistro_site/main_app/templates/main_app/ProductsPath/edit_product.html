@@ -1,0 +1,65 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+	    <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
+    </head>
+
+    <body>    
+        <div class="menu">
+
+            <div class="menu_text bistro_text">Бистро</div>
+            {%if request.user.position == "Шеф-повар"%}
+                {%include "main_app/shef.html"%}
+            {%elif request.user.position == "Кассир"%}
+                {%include "main_app/seller.html"%}
+            {%elif request.user.position == "Руководитель склада"%}
+                {%include "main_app/stock_manager.html"%}
+            {%elif request.user.position == "Бухгалтер"%}
+                {%include "main_app/accountant.html"%}
+            {%endif%}
+        </div>
+            
+        <div class="main_block">
+        <div class="header">
+            <div>Контакты</div>
+            <div>О нас</div>
+            <div>Выход</div>
+        </div>
+        <hr>
+	{%if request.user.position != "Руководитель склада"%}
+	<div class="welcome">Доступ запрещен!</div>
+	{%else%}
+        <div class="interact_block">
+            <div class="description">
+                Редактирование продукта питания
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="add_field">
+                    {{form.name}}
+                </div>
+                <div class="add_field">
+                    {{form.weight}}
+                </div>
+                <div class="add_field">
+                    {{form.calories}}
+                </div>
+                <div class="add_field">
+                    {{form.price}}
+                </div>
+                <span>{{ error }}</span>
+                <div class="buttons">
+		    <input type="submit" value="Удалить" class="reset" name="button_type">
+                    <input type="submit" value="Сохранить" class="save" name="button_type">
+                </div>
+            </form>
+        </div>
+	{%endif%}
+	</div>
+    </body>
+
+    <footer>
+    </footer>
+</html>

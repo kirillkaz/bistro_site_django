@@ -165,13 +165,13 @@ body {
 .input_field-img-icon{
     transition: 0.2s;
     opacity: 0.25;
-    width: 200px;
-    height: 200px;
+    width: 2000px;
+    height: 2000px;
 }
 
 .table_img{
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
 }
 
 .input_field-img-icon:hover{

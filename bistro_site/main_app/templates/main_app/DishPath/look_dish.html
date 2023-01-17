@@ -40,6 +40,8 @@
                             <td>id</td>
                             <td>Название</td>
                             <td>Тип блюда</td>
+			    <td>Вес</td>
+			    <td>Калорийность</td>
                             <td>Состав</td>
                             <td>Картинка</td>
                             <td class="last_td"></td>
@@ -52,6 +54,8 @@
                             <td>{{i.id_id}}</td>
                             <td>{{i.id.name}}</td>
                             <td>{{i.type}}</td>
+			    <td>{{i.weight}}г</td>
+			    <td>{{i.calories}}Ккал</td>
                             <td>
                                 {%for j in dish_composition%}
 				    {%if j.dish_id == i.id_id%}

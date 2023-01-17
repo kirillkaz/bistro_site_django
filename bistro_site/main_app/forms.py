@@ -1,5 +1,16 @@
+import datetime
 from django import forms
 from .models import recipe, dish, product,DishComposition, DailyReport
+
+
+class DailyReportForm(forms.ModelForm):
+    date = forms.DateField(input_formats=['%d.%m.%Y'], initial=datetime.date.today(), widget=forms.DateInput(format = '%d.%m.%Y', attrs={'placeholder': 'дд.мм.гггг', 'class': 'input_field'}))
+    dish_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Название блюда', 'class': 'input_field'}))
+    count = forms.IntegerField(widget=forms.TextInput(attrs={'placeholder': 'Количество проданных блюд', 'class': 'input_field'}))
+
+    class Meta:
+        model = DailyReport
+        fields = ('date', 'dish_name', 'count')
 
 
 class DishCompositionForm(forms.ModelForm):

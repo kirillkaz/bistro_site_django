@@ -11,7 +11,11 @@ from main_app.views import LoadMainPage,\
         LoadEditDishPage,\
         LoadLookDishcompositionPage,\
         LoadAddDishcompositionPage,\
-        LoadEditDishcompositionPage
+        LoadEditDishcompositionPage,\
+        LoadAddDailyReportPage,\
+        LoadLookGlobalDailyReportPage,\
+        LoadLookLocalDailyReportPage,\
+        LoadEditDailyReportPage
 
 urlpatterns = [
         path('', LoadMainPage, name='main_page'),
@@ -27,4 +31,8 @@ urlpatterns = [
         path('look/dishcomposition', LoadLookDishcompositionPage, name='look_dishcomposition'),
         path('add/dishcomposition', LoadAddDishcompositionPage, name='add_dishcomposition'),
         path('edit/dishcomposition', LoadEditDishcompositionPage, name='edit_dishcomposition'),
+        path('add/dailyreport', LoadAddDailyReportPage, name='add_dailyreport'),
+        path('look/globaldailyreport', LoadLookGlobalDailyReportPage, name='look_global_dailyreport'),
+        path('look/localdailyreport', LoadLookLocalDailyReportPage, name='look_local_dailyreport'),
+        path('edit/dailyreport', LoadEditDailyReportPage, name='edit_dailyreport'),
         ]

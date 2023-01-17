@@ -1,8 +1,137 @@
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
-from main_app.forms import ProductForm, RecipeForm, DishForm, DishCompositionForm
-from main_app.models import product, recipe, dish, DishComposition
+from django.db.models import Q, F
+from main_app.forms import ProductForm, RecipeForm, DishForm, DishCompositionForm, DailyReportForm
+from main_app.models import product, recipe, dish, DishComposition, DailyReport
 
+
+@csrf_exempt
+def LoadEditDailyReportPage(request):
+    error = ''
+    cur_name = None
+    cur_date = None
+    cur_id = None
+    try:
+        cur_name = request.GET['name']
+        cur_date = request.GET['date']
+        cur_id = request.GET['reportID']
+    except:
+        pass
+
+    if request.method == 'POST':
+        form = DailyReportForm(request.POST)
+        if form.is_valid():
+                
+            if cur_name == None:
+                error = f'Невозможно добавить информацию о продажах, так как блюда с названием {cur_name} не существует.'
+            elif cur_date == None:
+                error = f'Невозможно редактировать информацию о продажах, нет продажи этого блюда за {cur_date} число.'
+            elif cur_id == None:
+                error = f'Невозможно редактировать информации об этой продаже, так как ее не существует.'
+            else:
+                editable_dailyreport = DailyReport.objects.get(id=cur_id)
+                editable_dailyreport.date = editable_dailyreport.date
+                editable_dailyreport.count = form.cleaned_data.get('count')
+                editable_dailyreport.save()
+                return redirect('look_global_dailyreport')
+        else:
+            error = f'{form.cleaned_data.get("date")} {form.cleaned_data.get("dish_name")} {form.cleaned_data.get("count")}'
+
+    form = DailyReportForm
+    context={'form': form, 'error': error, 'cur_name': cur_name, 'cur_date': cur_date}
+
+    return render(request, 'main_app/DailyReportPath/edit_dailyreport.html', context)
+
+
+
+@csrf_exempt
+def LoadLookLocalDailyReportPage(request):
+    cur_date = ''
+    try:
+        cur_date = request.GET['date']
+    except:
+        pass
+    # TODO потом разобраться и сделать нормально
+    local_reports = DailyReport.objects.raw(
+            """
+            select main_app_dailyreport.id as id,
+            main_app_recipe.name as name,
+            main_app_dailyreport.count,
+            to_char(main_app_dailyreport."date",'DD.MM.YYYY') as date, 
+            round(sum((main_app_product.price/1000.00)*main_app_product.weight*main_app_dishcomposition.product_count*main_app_dailyreport.count),2) as price
+            from main_app_dailyreport
+            inner join main_app_dishcomposition on main_app_dishcomposition.dish_id = main_app_dailyreport.dish_id 
+            inner join main_app_product on main_app_product.id = main_app_dishcomposition.product_id
+            inner join main_app_recipe on main_app_dishcomposition.dish_id = main_app_recipe.id
+            where main_app_dailyreport.dish_id = main_app_dishcomposition.dish_id
+            group by main_app_dailyreport."date", main_app_dailyreport.id, main_app_recipe.name, main_app_dailyreport.count
+            order by price;
+            """
+            )
+    
+    context = {'local_reports': local_reports, 'cur_date': cur_date}
+    return render(request, 'main_app/DailyReportPath/look_dailyreport_local.html', context)
+
+
+@csrf_exempt
+def LoadLookGlobalDailyReportPage(request):
+    # TODO потом разобраться и сделать нормально
+    global_reports = DailyReport.objects.raw(
+            """
+            select 1 as id, to_char(main_app_dailyreport."date",'DD.MM.YYYY') as date,  round(sum((main_app_product.price/1000.00)*main_app_product.weight*main_app_dishcomposition.product_count*main_app_dailyreport.count),2) as price
+            from main_app_dailyreport
+            inner join main_app_dishcomposition on main_app_dishcomposition.dish_id = main_app_dailyreport.dish_id 
+            inner join main_app_product on main_app_product.id = main_app_dishcomposition.product_id
+            inner join main_app_dish on main_app_dishcomposition.dish_id = main_app_dish.id_id
+            where main_app_dailyreport.dish_id = main_app_dishcomposition.dish_id
+            group by main_app_dailyreport."date", 1
+            order by date
+            """
+            )
+
+    context = {'global_reports': global_reports}
+    return render(request, 'main_app/DailyReportPath/look_dailyreport_global.html', context)
+
+
+@csrf_exempt
+def LoadAddDailyReportPage(request):
+    error = ''
+    if request.method == 'POST':
+        form = DailyReportForm(request.POST)
+        if form.is_valid():
+            new_id = 1
+        
+            dailyreports = DailyReport.objects.all()
+            dailyreports_id = [i.id for i in dailyreports]
+            for i in range(1,1001):
+                if i not in dailyreports_id:
+                    new_id = i
+                    break
+                
+            dish_name = form.cleaned_data.get('dish_name')
+            enabled_recipe = None
+            enabled_dish = None
+            try:
+                enabled_recipe = recipe.objects.get(name=dish_name)
+                enabled_dish = dish.objects.get(id=enabled_recipe.id)
+            except:
+                pass
+
+            if enabled_recipe == None or enabled_dish == None:
+                error=f'Невозможно добавить информацию о продажах, так как блюда с названием {dish_name} не существует.'
+            else:
+                new_dailyreport = DailyReport()
+                new_dailyreport.id = new_id
+                new_dailyreport.date = form.cleaned_data.get('date')
+                new_dailyreport.dish = enabled_dish
+                new_dailyreport.count = form.cleaned_data.get('count')
+                new_dailyreport.save()
+        else:
+            error = f'{form.cleaned_data.get("date")} {form.cleaned_data.get("dish_name")} {form.cleaned_data.get("count")}'
+    form = DailyReportForm
+    context={'form': form, 'error': error}
+
+    return render(request, 'main_app/DailyReportPath/add_dailyreport.html', context)
 
 @csrf_exempt
 def LoadEditDishcompositionPage(request):
@@ -130,8 +259,21 @@ def LoadEditDishPage(request):
 
 @csrf_exempt
 def LoadLookDishPage(request):
-    dishes = dish.objects.all().order_by('id_id')
+    # TODO потом разобраться и сделать нормально
+    dishes = dish.objects.raw(
+            """
+            select main_app_dish.id_id, main_app_dish."type", main_app_dish.img, sum(main_app_product.weight) as weight, sum(main_app_product.calories) as calories
+            from main_app_product
+            inner join main_app_dishcomposition on main_app_dishcomposition.product_id = main_app_product.id
+            inner join main_app_dish on main_app_dish.id_id = main_app_dishcomposition.dish_id
+            where main_app_dish.id_id = main_app_dishcomposition.dish_id
+            group by main_app_dish.id_id, main_app_dish."type", main_app_dish.img order by id_id
+            """
+            )
+
+    #dishes = dish.objects.all().order_by('id_id')
     dish_composition = DishComposition.objects.all()
+
     context = {'dishes': dishes, 'dish_composition': dish_composition}
     return render(request, 'main_app/DishPath/look_dish.html', context)
 

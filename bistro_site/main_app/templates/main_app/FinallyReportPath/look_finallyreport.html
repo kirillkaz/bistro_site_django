@@ -1,13 +1,13 @@
-{%load static%}
+{%load static%} 
 <!DOCTYPE html>
-<html>      
-    <head>  
+<html>
+    <head>      
             <link rel="stylesheet" type="text/css" href="{%static 'css/main_page_style.css'%}">
     </head>
-
+                
     <body>
         <div class="menu">
-
+                
             <div class="menu_text bistro_text">Бистро</div>
             {%if request.user.position == "Шеф-повар"%}
                 {%include "main_app/shef.html"%}
@@ -19,7 +19,7 @@
                 {%include "main_app/accountant.html"%}
             {%endif%}
         </div>
-
+                
       <div class="main_block">
             <div class="header">
                 <div>Контакты</div>
@@ -28,40 +28,54 @@
             </div>
             <hr>
                 
-            {% if request.user.position != "Кассир" and request.user.position != "Бухгалтер" %}
+            {% if request.user.position != "Бухгалтер" %}
             <div class="welcome">Доступ запрещен!</div>
-
+                
             {%else%}
             <div class="interact_block">
                 <div class="description">
-		    Просмотр проданных блюд за {{cur_date}}
+			Составление отчета {{cur_year}} год
                 </div>
-
+		
 		<form>
                     <table>
                         <tr>
                             <td>Название блюда</td>
-                            <td>Количество проданных блюд</td>
-			    <td>Прибыль за проданные блюда</td>
-			    {% if request.user.position == "Кассир" %}
-                            <td class="last_td"></td>
-			    {%endif%}
+			    <td>Количество порций</td>
+			    <td>Стоимость одного блюда, руб.</td>
+			    <td>Стоимость проданных блюд, руб.</td>
                         </tr>
                     </table>
                     <div class="table_block">
                         <table>
-                        {%for i in local_reports%}
-			{%if i.date == cur_date%}
-                         <tr>
-                            <td>{{i.name}}</td>
-                            <td>{{i.count}}</td>
-			    <td>{{i.price}}</td>
-			    {% if request.user.position == "Кассир" %}
-			    <td class="last_td"><a href="http://146.185.240.26/hub/edit/dailyreport?reportID={{i.id}}&date={{cur_date}}&name={{i.name}}"><input type="button" class="save" value="редактировать"></a></td>
-			    {%endif%}
-                        </tr>
-			{%endif%}
+                        {%for i in days_results%}
+			<tr>
+			    <td class="td_result">Дата {{i.date}}</td>
+			    <td></td>
+			    <td></td>
+			    <td></td>
+			</tr>
+			    {%for j in daily_reports_with_dishprices%}
+			        {%if i.date == j.record.date%}
+                         	    <tr>
+                            	    <td>{{j.record.name}}</td>
+				    <td>{{j.record.count}}</td>
+				    <td>{{j.dish_price}}</td>
+				    <td>{{j.record.price}}</td>
+                        	    </tr>
+				{%endif%}
+			    {%endfor%}
+			    <tr>
+				<td class="td_result">Итого на дату:</td>
+				<td></td>
+				<td></td>
+				<td class="td_result">{{i.price}}</td>
+			    </tr>
+		    	    <tr><td colspan="4"></td></tr>
                         {%endfor%}
+			<tr>
+				<td colspan="4"><span class="td_result">Итого по предприятию: {{cur_year_results.price}}</span></td>
+			</tr>
                         </table>
                     </div>
                 </form>

@@ -15,7 +15,9 @@ from main_app.views import LoadMainPage,\
         LoadAddDailyReportPage,\
         LoadLookGlobalDailyReportPage,\
         LoadLookLocalDailyReportPage,\
-        LoadEditDailyReportPage
+        LoadEditDailyReportPage,\
+        LoadLookFinallyReportYearsPage,\
+        LoadMakeFinallyReportPage
 
 urlpatterns = [
         path('', LoadMainPage, name='main_page'),
@@ -35,4 +37,6 @@ urlpatterns = [
         path('look/globaldailyreport', LoadLookGlobalDailyReportPage, name='look_global_dailyreport'),
         path('look/localdailyreport', LoadLookLocalDailyReportPage, name='look_local_dailyreport'),
         path('edit/dailyreport', LoadEditDailyReportPage, name='edit_dailyreport'),
+        path('look/finallyreport/years', LoadLookFinallyReportYearsPage, name='look_finallyreport_years'),
+        path('make/finallyreport', LoadMakeFinallyReportPage, name='make_finallyreport'),
         ]

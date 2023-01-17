@@ -306,6 +306,12 @@ td{
     height: 50px;
 }
 
+.td_result{
+    font-size: 1.3em;
+    font-family: 'Montserrat', 'Arial';
+    font-weight: bolder;
+}
+
 .td_area{
     display: flex;
     text-align: justify;

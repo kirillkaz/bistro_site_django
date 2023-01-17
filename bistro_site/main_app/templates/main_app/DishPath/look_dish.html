@@ -26,7 +26,7 @@
                 <div>Выход</div>
             </div>
             <hr>
-            {%if request.user.position != "Шеф-повар"%}
+            {% if request.user.position != "Шеф-повар" and request.user.position != "Кассир" %}
             <div class="welcome">Доступ запрещен!</div>
             {%else%}
             <div class="interact_block">
@@ -44,7 +44,9 @@
 			    <td>Калорийность</td>
                             <td>Состав</td>
                             <td>Картинка</td>
+			    {%if request.user.position == "Шеф-повар"%}
                             <td class="last_td"></td>
+			    {%endif%}
                         </tr>
                     </table>
                     <div class="table_block">
@@ -64,10 +66,12 @@
                                 {%endfor%}
                             </td>
                             <td><img class="table_img" src={{i.img.url}}></td>
+			    {%if request.user.position == "Шеф-повар"%}
                             <td class="last_td">
 				<a href="http://146.185.240.26/hub/edit/dish?dishID={{i.id_id}}"><input type="button" class="save" value="редактировать"></a><br><br>
                                 <a href="http://146.185.240.26/hub/look/dishcomposition?dishID={{i.id_id}}"><input type="button" class="save" value="изменить состав"></a>
                             </td>
+			    {%endif%}
                         </tr>
                         {%endfor%}
                         </table>

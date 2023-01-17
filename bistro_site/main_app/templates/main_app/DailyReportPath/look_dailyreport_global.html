@@ -28,7 +28,7 @@
             </div>
             <hr>
 
-            {%if request.user.position != "Кассир"%}
+            {% if request.user.position != "Кассир" and request.user.position != "Бухгалтер" %}
             <div class="welcome">Доступ запрещен!</div>
 
             {%else%}

@@ -6,6 +6,97 @@ from main_app.models import product, recipe, dish, DishComposition, DailyReport
 
 
 @csrf_exempt
+def LoadMakeFinallyReportPage(request):
+    daily_reports = DailyReport.objects.raw(
+            """
+            select main_app_dailyreport.id as id,
+            main_app_recipe.name as name,
+            main_app_dailyreport.count,
+            to_char(main_app_dailyreport."date",'DD.MM.YYYY') as date, 
+            round(sum((main_app_product.price/1000.00)*main_app_product.weight*main_app_dishcomposition.product_count*main_app_dailyreport.count),2) as price
+            from main_app_dailyreport
+            inner join main_app_dishcomposition on main_app_dishcomposition.dish_id = main_app_dailyreport.dish_id 
+            inner join main_app_product on main_app_product.id = main_app_dishcomposition.product_id
+            inner join main_app_recipe on main_app_dishcomposition.dish_id = main_app_recipe.id
+            where main_app_dailyreport.dish_id = main_app_dishcomposition.dish_id
+            group by main_app_dailyreport."date", main_app_dailyreport.id, main_app_recipe.name, main_app_dailyreport.count
+            order by date;
+            """
+            )
+
+    finally_sums = DailyReport.objects.raw(
+            """
+            select 1 as id, extract(year from main_app_dailyreport."date") as date,  round(sum((main_app_product.price/1000.00)*main_app_product.weight*main_app_dishcomposition.product_count*main_app_dailyreport.count),2) as price
+            from main_app_dailyreport
+            inner join main_app_dishcomposition on main_app_dishcomposition.dish_id = main_app_dailyreport.dish_id 
+            inner join main_app_product on main_app_product.id = main_app_dishcomposition.product_id
+            inner join main_app_dish on main_app_dishcomposition.dish_id = main_app_dish.id_id
+            where main_app_dailyreport.dish_id = main_app_dishcomposition.dish_id
+            group by extract(year from main_app_dailyreport."date"), 1
+            order by date
+            """
+            )
+    
+    daily_reports_results = DailyReport.objects.raw(
+            """
+            select 1 as id, to_char(main_app_dailyreport."date",'DD.MM.YYYY') as date,  round(sum((main_app_product.price/1000.00)*main_app_product.weight*main_app_dishcomposition.product_count*main_app_dailyreport.count),2) as price
+            from main_app_dailyreport
+            inner join main_app_dishcomposition on main_app_dishcomposition.dish_id = main_app_dailyreport.dish_id
+            inner join main_app_product on main_app_product.id = main_app_dishcomposition.product_id
+            inner join main_app_dish on main_app_dishcomposition.dish_id = main_app_dish.id_id
+            where main_app_dailyreport.dish_id = main_app_dishcomposition.dish_id
+            group by main_app_dailyreport."date", 1
+            order by date
+            """
+            )
+
+    cur_year = None
+    cur_year_results = None
+    days_results = []
+    try:
+        cur_year = request.GET['year']
+    except:
+        pass
+    #выбираю текущий год
+    for i in finally_sums:
+        if cur_year == str(i.date):
+            cur_year_results = i
+            break
+    #заполняю массив с продажами, актуальными на этот год
+    for i in daily_reports:
+        if i.date.split('.')[2] == cur_year:
+            days_results.append(i)
+    
+    daily_reports_with_dishprices = []
+
+    #записываю в массив записи о продажах + стоимость за одно блюдо
+    for i in days_results:
+        record = {'record': i, 'dish_price': round(i.price/i.count, 2)}
+        daily_reports_with_dishprices.append(record)
+
+    message = f'{days_results[0].date} {daily_reports_with_dishprices[0]["record"].date}'
+    context = {'days_results': days_results, 'cur_year_results': cur_year_results, 'daily_reports_with_dishprices': daily_reports_with_dishprices, 'cur_year': cur_year, 'message': message}
+    return render(request, 'main_app/FinallyReportPath/look_finallyreport.html', context)
+
+
+
+@csrf_exempt
+def LoadLookFinallyReportYearsPage(request):
+    reports = DailyReport.objects.all().order_by('date')
+
+    years = []
+
+    for i in reports:
+        year = i.date.year
+        if year not in years:
+            years.append(year)
+
+    context = {'years': years}
+    return render(request, 'main_app/FinallyReportPath/look_years_finallyreport.html', context)
+
+
+
+@csrf_exempt
 def LoadEditDailyReportPage(request):
     error = ''
     cur_name = None

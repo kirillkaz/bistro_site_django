@@ -78,6 +78,11 @@ body {
     text-decoration: none;
 }
 
+.header a{
+    color:#E8E8E8;
+    text-decoration: none;
+}
+
 .main_block hr{
     background-color: #243143;
     

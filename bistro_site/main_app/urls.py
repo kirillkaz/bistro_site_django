@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as authViews
 from main_app.views import LoadMainPage,\
         LoadAddProdPage,\
         LoadLookProdPage,\
@@ -39,4 +40,5 @@ urlpatterns = [
         path('edit/dailyreport', LoadEditDailyReportPage, name='edit_dailyreport'),
         path('look/finallyreport/years', LoadLookFinallyReportYearsPage, name='look_finallyreport_years'),
         path('make/finallyreport', LoadMakeFinallyReportPage, name='make_finallyreport'),
+        path('logout', authViews.LogoutView.as_view(), name='exit'),
         ]

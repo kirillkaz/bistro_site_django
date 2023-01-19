@@ -18,8 +18,8 @@ class product(models.Model):
             validators=[MinValueValidator(1), MaxValueValidator(100000)]
             )
     name = models.CharField(max_length=30)
-    weight = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100000)])
-    calories = models.IntegerField(validators=[MinValueValidator(30), MaxValueValidator(10000)])
+    weight = models.IntegerField()
+    calories = models.IntegerField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
 
@@ -44,4 +44,4 @@ class DailyReport(models.Model):
     id = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(100000)], primary_key=True)
     date = models.DateField()
     dish = models.ForeignKey('dish', on_delete=models.CASCADE)
-    count = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(200)])
+    count = models.IntegerField()

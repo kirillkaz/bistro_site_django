@@ -32,7 +32,6 @@
                 <div class="description">
 		    Просмотр состава {{cur_dish.id.name}}
                 </div>
-		<form method="post">
                     <table>
                         <tr>
                             <td>id</td>
@@ -50,15 +49,18 @@
                             <td>{{i.product.name}}</td>
                             <td>{{i.product_count}}</td>
 			    <td class="last_td">
+				    <form method="post">
 				     <input type="text" class="hidden" value="{{i.record_id}}" name="record_id">
 				     <a href="http://146.185.240.26/hub/edit/dishcomposition?dishcompositionID={{i.record_id}}&productID={{i.product_id}}"><input type="button" class="save" value="изменить"></a><br><br>
 				     <input type="submit" class="reset" value="удалить" name="button_type">
+				     </form>
 			    </td>
                         </tr>
 			{%endif%}
                         {%endfor%}
                         </table>
                     </div>
+		    <form method="post">
 		    <div class="button">
 			   <a href="http://146.185.240.26/hub/add/dishcomposition?dishID={{cur_dish.id_id}}" class="button"><input type="button" value="Добавить продукт" class="save"></a>
                     </div>

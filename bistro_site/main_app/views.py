@@ -3,7 +3,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q, F
 from main_app.forms import ProductForm, RecipeForm, DishForm, DishCompositionForm, DailyReportForm
 from main_app.models import product, recipe, dish, DishComposition, DailyReport
-
+from main_app.error_checker import CheckProduct,\
+        CheckRecipe,\
+        CheckDish,\
+        CheckDailyreport,\
+        CheckDishcomposition
 
 @csrf_exempt
 def LoadMakeFinallyReportPage(request):
@@ -114,23 +118,23 @@ def LoadEditDailyReportPage(request):
         pass
 
     if request.method == 'POST':
-        form = DailyReportForm(request.POST)
-        if form.is_valid():
-                
-            if cur_name == None:
-                error = f'Невозможно добавить информацию о продажах, так как блюда с названием {cur_name} не существует.'
-            elif cur_date == None:
-                error = f'Невозможно редактировать информацию о продажах, нет продажи этого блюда за {cur_date} число.'
-            elif cur_id == None:
-                error = f'Невозможно редактировать информации об этой продаже, так как ее не существует.'
-            else:
-                editable_dailyreport = DailyReport.objects.get(id=cur_id)
-                editable_dailyreport.date = editable_dailyreport.date
-                editable_dailyreport.count = form.cleaned_data.get('count')
-                editable_dailyreport.save()
-                return redirect('look_global_dailyreport')
-        else:
-            error = f'{form.cleaned_data.get("date")} {form.cleaned_data.get("dish_name")} {form.cleaned_data.get("count")}'
+        error = CheckDailyreport(request)
+        if error == '':
+            form = DailyReportForm(request.POST)
+            if form.is_valid():
+            
+                if cur_name == None:
+                    error = f'Невозможно добавить информацию о продажах, так как блюда с названием {cur_name} не существует.'
+                elif cur_date == None:
+                    error = f'Невозможно редактировать информацию о продажах, нет продажи этого блюда за {cur_date} число.'
+                elif cur_id == None:
+                    error = f'Невозможно редактировать информации об этой продаже, так как ее не существует.'
+                else:
+                    editable_dailyreport = DailyReport.objects.get(id=cur_id)
+                    editable_dailyreport.date = editable_dailyreport.date
+                    editable_dailyreport.count = form.cleaned_data.get('count')
+                    editable_dailyreport.save()
+                    return redirect('look_global_dailyreport')
 
     form = DailyReportForm
     context={'form': form, 'error': error, 'cur_name': cur_name, 'cur_date': cur_date}
@@ -163,7 +167,11 @@ def LoadLookLocalDailyReportPage(request):
             order by price;
             """
             )
-    
+    if request.method == "POST":
+        record = DailyReport.objects.get(id=request.POST['record_id'])
+        if request.POST['button_type'] == "удалить":
+            record.delete()
+            return redirect('look_global_dailyreport')
     context = {'local_reports': local_reports, 'cur_date': cur_date}
     return render(request, 'main_app/DailyReportPath/look_dailyreport_local.html', context)
 
@@ -192,37 +200,38 @@ def LoadLookGlobalDailyReportPage(request):
 def LoadAddDailyReportPage(request):
     error = ''
     if request.method == 'POST':
-        form = DailyReportForm(request.POST)
-        if form.is_valid():
-            new_id = 1
+        error = CheckDailyreport(request)
+        if error == '':
+            form = DailyReportForm(request.POST)
+            if form.is_valid():
+                new_id = 1
         
-            dailyreports = DailyReport.objects.all()
-            dailyreports_id = [i.id for i in dailyreports]
-            for i in range(1,1001):
-                if i not in dailyreports_id:
-                    new_id = i
-                    break
+                dailyreports = DailyReport.objects.all()
+                dailyreports_id = [i.id for i in dailyreports]
+                for i in range(1,1001):
+                    if i not in dailyreports_id:
+                        new_id = i
+                        break
                 
-            dish_name = form.cleaned_data.get('dish_name')
-            enabled_recipe = None
-            enabled_dish = None
-            try:
-                enabled_recipe = recipe.objects.get(name=dish_name)
-                enabled_dish = dish.objects.get(id=enabled_recipe.id)
-            except:
-                pass
+                dish_name = form.cleaned_data.get('dish_name')
+                enabled_recipe = None
+                enabled_dish = None
+                try:
+                    enabled_recipe = recipe.objects.get(name=dish_name)
+                    enabled_dish = dish.objects.get(id=enabled_recipe.id)
+                except:
+                    pass
 
-            if enabled_recipe == None or enabled_dish == None:
-                error=f'Невозможно добавить информацию о продажах, так как блюда с названием {dish_name} не существует.'
-            else:
-                new_dailyreport = DailyReport()
-                new_dailyreport.id = new_id
-                new_dailyreport.date = form.cleaned_data.get('date')
-                new_dailyreport.dish = enabled_dish
-                new_dailyreport.count = form.cleaned_data.get('count')
-                new_dailyreport.save()
-        else:
-            error = f'{form.cleaned_data.get("date")} {form.cleaned_data.get("dish_name")} {form.cleaned_data.get("count")}'
+                if enabled_recipe == None or enabled_dish == None:
+                    error=f'Невозможно добавить информацию о продажах, так как блюда с названием {dish_name} не существует.'
+                else:
+                    new_dailyreport = DailyReport()
+                    new_dailyreport.id = new_id
+                    new_dailyreport.date = form.cleaned_data.get('date')
+                    new_dailyreport.dish = enabled_dish
+                    new_dailyreport.count = form.cleaned_data.get('count')
+                    new_dailyreport.save()
+
     form = DailyReportForm
     context={'form': form, 'error': error}
 
@@ -241,14 +250,14 @@ def LoadEditDishcompositionPage(request):
     edited_dishcomposition = DishComposition.objects.get(record_id=dishcompositionID)
 
     if request.method == 'POST':
-        form = DishCompositionForm(request.POST)
-        form.name = 'Какое-то название'
-        if form.is_valid():
-            edited_dishcomposition.product_count = form.cleaned_data.get('product_count')
-            edited_dishcomposition.save()
-            return redirect(f'http://146.185.240.26/hub/look/dishcomposition?dishID={edited_dishcomposition.dish.id_id}')
-        else:
-            error = f'{form.cleaned_data.get("name")} {form.cleaned_data.get("product_count")}'
+        error = CheckDishcomposition(request)
+        if error == '':
+            form = DishCompositionForm(request.POST)
+            form.name = 'Какое-то название'
+            if form.is_valid():
+                edited_dishcomposition.product_count = form.cleaned_data.get('product_count')
+                edited_dishcomposition.save()
+                return redirect(f'http://146.185.240.26/hub/look/dishcomposition?dishID={edited_dishcomposition.dish.id_id}')
     
     product_name = product.objects.get(id=request.GET['productID']).name
     form = DishCompositionForm(initial={'name': edited_dishcomposition.dish.id.name, 'product_count': edited_dishcomposition.product_count})
@@ -262,37 +271,38 @@ def LoadEditDishcompositionPage(request):
 def LoadAddDishcompositionPage(request):
     error = ''
     if request.method == 'POST':
-        form = DishCompositionForm(request.POST)
-        if form.is_valid():
-            new_id = 1
+        error = CheckDishcomposition(request)
+        if error == '':
+            form = DishCompositionForm(request.POST)
+            if form.is_valid():
+                new_id = 1
     
-            dishcompositions = DishComposition.objects.all()
-            dishcompositions_id = [i.record_id for i in dishcompositions]
-            for i in range(1,1001):
-                if i not in dishcompositions_id:
-                    new_id = i
-                    break
+                dishcompositions = DishComposition.objects.all()
+                dishcompositions_id = [i.record_id for i in dishcompositions]
+                for i in range(1,1001):
+                    if i not in dishcompositions_id:
+                        new_id = i
+                        break
 
-            product_name = form.cleaned_data.get('name')
-            added_product = None
-            editable_dish = dish.objects.get(id=request.GET['dishID'])
+                product_name = form.cleaned_data.get('name')
+                added_product = None
+                editable_dish = dish.objects.get(id=request.GET['dishID'])
 
-            try:
-                added_product = product.objects.get(name=product_name)
-            except:
-                pass
+                try:
+                    added_product = product.objects.get(name=product_name)
+                except:
+                    pass
 
-            if added_product == None:
-                error='Невозможно добавить продукт в состав, так как его нет на складе.'
-            else:
-                new_dishcomposition = DishComposition()
-                new_dishcomposition.record_id = new_id
-                new_dishcomposition.product_count = form.cleaned_data.get('product_count')
-                new_dishcomposition.dish = editable_dish
-                new_dishcomposition.product = added_product
-                new_dishcomposition.save()
-        else:
-            error = f'{form.cleaned_data.get("name")} {form.cleaned_data.get("count")}'
+                if added_product == None:
+                    error='Невозможно добавить продукт в состав, так как его нет на складе.'
+                else:
+                    new_dishcomposition = DishComposition()
+                    new_dishcomposition.record_id = new_id
+                    new_dishcomposition.product_count = form.cleaned_data.get('product_count')
+                    new_dishcomposition.dish = editable_dish
+                    new_dishcomposition.product = added_product
+                    new_dishcomposition.save()
+
     form = DishCompositionForm
     context={'form': form, 'error': error}
 
@@ -331,20 +341,19 @@ def LoadEditDishPage(request):
         
     editable_dish = dish.objects.get(id=dishID)
     if request.method == 'POST':
-        form = DishForm(request.POST, request.FILES)
-        form.name = 'Какое-то название'
-        if form.is_valid():
-            if request.POST.get('button_type') == 'Удалить':
-                editable_dish.delete()
-                return redirect('look_dish')
-            else:
-                editable_dish.img = form.cleaned_data.get('img')
-                editable_dish.type = form.cleaned_data.get('type')
-                editable_dish.save()
-                return redirect('look_dish')
-        else:
-            error = f'{form.cleaned_data.get("type")} {form.cleaned_data.get("img")}'
-
+        error = CheckDish(request)
+        if error == '':
+            form = DishForm(request.POST, request.FILES)
+            form.name = 'Какое-то название'
+            if form.is_valid():
+                if request.POST.get('button_type') == 'Удалить':
+                    editable_dish.delete()
+                    return redirect('look_dish')
+                else:
+                    editable_dish.img = form.cleaned_data.get('img')
+                    editable_dish.type = form.cleaned_data.get('type')
+                    editable_dish.save()
+                    return redirect('look_dish')
     
     form = DishForm(initial={'name': editable_dish.id.name,'type': editable_dish.type, 'img': editable_dish.img})
     context = {'form': form, 'error': error, 'editable_dish': editable_dish}
@@ -355,7 +364,7 @@ def LoadEditDishPage(request):
 @csrf_exempt
 def LoadLookDishPage(request):
     # TODO потом разобраться и сделать нормально
-    dishes = dish.objects.raw(
+    dishes_with_compositions = dish.objects.raw(
             """
             select main_app_dish.id_id, main_app_dish."type", main_app_dish.img, sum(main_app_product.weight) as weight, sum(main_app_product.calories) as calories
             from main_app_product
@@ -366,10 +375,29 @@ def LoadLookDishPage(request):
             """
             )
 
-    #dishes = dish.objects.all().order_by('id_id')
+    dishes_all = dish.objects.all().order_by('id_id')
+    dishes = []
+    dishes_id = []
+    #отбираю блюда с составом
+    for i in dishes_with_compositions:
+        dishes_id.append(i.id_id)
+        dishes.append(i)
+    #записываю в массив все блюда и добавляю те, что без состава
+    for i in dishes_all:
+        if i.id_id not in dishes_id:
+            dishes.append(i)
+    #сортирую блюда по id
+    dishes = sorted(dishes, key=lambda dish_id: dish_id.id_id)
     dish_composition = DishComposition.objects.all()
+    
+    if request.method == "POST":
+        if request.POST['button_type'] == 'удалить':
+            dish_id = request.POST['record_id']
+            record = dish.objects.get(id_id=dish_id)
+            record.delete()
+            return redirect('main_page')
 
-    context = {'dishes': dishes, 'dish_composition': dish_composition}
+    context = {'dishes': dishes, 'dish_composition': dish_composition, 'dishes_with_compositions': dishes_with_compositions}
     return render(request, 'main_app/DishPath/look_dish.html', context)
 
 
@@ -377,26 +405,27 @@ def LoadLookDishPage(request):
 def LoadAddDishPage(request):
     error = ''
     if request.method == 'POST':
-        form = DishForm(request.POST, request.FILES)
-        if form.is_valid():
-            dish_name = form.cleaned_data.get('name')
-            dish_recipe = None
+        error = CheckDish(request)
+        if error == '':
 
-            try:
-                dish_recipe = recipe.objects.get(name=dish_name)
-            except:
-                pass
+            form = DishForm(request.POST, request.FILES)
+            if form.is_valid():
+                dish_name = form.cleaned_data.get('name')
+                dish_recipe = None
 
-            if dish_recipe == None:
-                error='Невозможно создать блюдо, так как для него нет рецепта.'
-            else:
-                new_dish = dish()
-                new_dish.id = dish_recipe
-                new_dish.img = form.cleaned_data.get('img')
-                new_dish.type = form.cleaned_data.get('type')
-                new_dish.save()
-        else:
-            error = f'{form.cleaned_data.get("name")} {form.cleaned_data.get("img")}: {type(form.img)} {form.cleaned_data.get("type")} {request.FILES} {request.POST["img"]}'
+                try:
+                    dish_recipe = recipe.objects.get(name=dish_name)
+                except:
+                    pass
+
+                if dish_recipe == None:
+                    error='Невозможно создать блюдо, так как для него нет рецепта.'
+                else:
+                    new_dish = dish()
+                    new_dish.id = dish_recipe
+                    new_dish.img = form.cleaned_data.get('img')
+                    new_dish.type = form.cleaned_data.get('type')
+                    new_dish.save()
 
     form = DishForm
     context={'form': form, 'error': error}
@@ -414,25 +443,33 @@ def LoadEditRecipePage(request):
         recipeID = request.GET.get('recipeID')
     except:
         pass
+    
+    try:
+        editable_recipe = recipe.objects.get(id=recipeID)
+    except:
+        editable_recipe = 'Не найден'
 
-    editable_recipe = recipe.objects.get(id=recipeID)
-    if request.method == 'POST':
-        form = RecipeForm(request.POST)
-        if form.is_valid():
-            if request.POST.get('button_type') == 'Удалить':
-                editable_recipe.delete()
-                return redirect('look_recipe')
-            else:
-                editable_recipe.name = form.cleaned_data.get('name')
-                editable_recipe.cooking_time = form.cleaned_data.get('cooking_time')
-                editable_recipe.cooking_technology = form.cleaned_data.get('cooking_technology')
-                editable_recipe.save()
-                return redirect('look_recipe')
-        else:
-            error = f'{form.cleaned_data.get("name")}\n{form.cleaned_data.get("cooking_time")}\n{form.cleaned_data.get("cooking_technology")}'
-
-
-    form = RecipeForm(initial={'name': editable_recipe.name, 'cooking_time': editable_recipe.cooking_time, 'cooking_technology': editable_recipe.cooking_technology})
+    if editable_recipe == 'Не найден':
+        error = f'Не было найдено рецепта с id {recipeID}'
+    else:
+        if request.method == 'POST':
+            form = RecipeForm(request.POST)
+            if form.is_valid():
+                if request.POST.get('button_type') == 'Удалить':
+                    editable_recipe.delete()
+                    return redirect('look_recipe')
+                else:
+                    error = CheckRecipe(request)
+                    if error == '':
+                        editable_recipe.name = form.cleaned_data.get('name')
+                        editable_recipe.cooking_time = form.cleaned_data.get('cooking_time')
+                        editable_recipe.cooking_technology = form.cleaned_data.get('cooking_technology')
+                        editable_recipe.save()
+                        return redirect('look_recipe')
+    if editable_recipe == 'Не найден':
+        return redirect('look_recipe')
+    else:
+        form = RecipeForm(initial={'name': editable_recipe.name, 'cooking_time': editable_recipe.cooking_time, 'cooking_technology': editable_recipe.cooking_technology})
     context = {'form': form, 'error': error}
     return render(request, 'main_app/RecipePath/edit_recipe.html', context)
 
@@ -449,25 +486,25 @@ def LoadLookRecipePage(request):
 def LoadAddRecipePage(request):
     error = ''
     if request.method == 'POST':
-        form = RecipeForm(request.POST)
-        new_id = 1
+        error = CheckRecipe(request)
+        if error == '':
+            form = RecipeForm(request.POST)
+            new_id = 1
         
-        recipes = recipe.objects.all()
-        recipes_id = [i.id for i in recipes]
-        for i in range(1,1001):
-            if i not in recipes_id:
-                new_id = i
-                break
+            recipes = recipe.objects.all()
+            recipes_id = [i.id for i in recipes]
+            for i in range(1,1001):
+                if i not in recipes_id:
+                    new_id = i
+                    break
             
-        if form.is_valid():
-            new_recipe = recipe()
-            new_recipe.id = new_id
-            new_recipe.name = form.cleaned_data.get('name')
-            new_recipe.cooking_time = form.cleaned_data.get('cooking_time')
-            new_recipe.cooking_technology = form.cleaned_data.get('cooking_technology')
-            new_recipe.save()
-        else:
-            error = f'{form.cleaned_data.get("name")}\n{form.cleaned_data.get("cooking_time")}\n{form.cleaned_data.get("cooking_technology")}'
+            if form.is_valid():
+                new_recipe = recipe()
+                new_recipe.id = new_id
+                new_recipe.name = form.cleaned_data.get('name')
+                new_recipe.cooking_time = form.cleaned_data.get('cooking_time')
+                new_recipe.cooking_technology = form.cleaned_data.get('cooking_technology')
+                new_recipe.save()
 
     form = RecipeForm
     context={'form': form, 'error': error}
@@ -483,24 +520,28 @@ def LoadEditProdPage(request):
     try:
         prodID = request.GET.get('prodID')
     except:
-        pass
+        prodID = 0
+    
+    if prodID == 0:
+        error = 'Ошибка! Нет продукта с id {prodID}!'
 
-    prod = product.objects.get(id=prodID)
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
-            if request.POST.get('button_type') == 'Удалить':
-                prod.delete()
-                return redirect('look_prod')
-            else:
-                prod.name = form.cleaned_data.get('name')
-                prod.weight = form.cleaned_data.get('weight')
-                prod.calories = form.cleaned_data.get('calories')
-                prod.price = form.cleaned_data.get('price')
-                prod.save()
-                return redirect('look_prod')
-        else:
-            error = f'{form.cleaned_data.get("name")}\n{form.cleaned_data.get("weight")}\n{form.cleaned_data.get("calories")}\n{form.cleaned_data.get("price")}'
+    else:
+        prod = product.objects.get(id=prodID)
+        if request.method == 'POST':
+            form = ProductForm(request.POST)
+            if form.is_valid():
+                if request.POST.get('button_type') == 'Удалить':
+                    prod.delete()
+                    return redirect('look_prod')
+                else:
+                    error = CheckProduct(request)
+                    if error == '':
+                        prod.name = form.cleaned_data.get('name')
+                        prod.weight = form.cleaned_data.get('weight')
+                        prod.calories = form.cleaned_data.get('calories')
+                        prod.price = form.cleaned_data.get('price')
+                        prod.save()
+                        return redirect('look_prod')
 
     
     form = ProductForm(initial={'name': prod.name, 'weight': prod.weight, 'calories': prod.calories, 'price': prod.price})
@@ -512,26 +553,26 @@ def LoadEditProdPage(request):
 def LoadAddProdPage(request):
     error = ''
     if request.method == 'POST':
-        form = ProductForm(request.POST)
-        new_id = 1
+        error = CheckProduct(request)
+        if error == '':
+            form = ProductForm(request.POST)
+            new_id = 1
 
-        products = product.objects.all()
-        prods_id = [i.id for i in products]
-        for i in range(1,1001):
-            if i not in prods_id:
-                new_id = i
-                break
+            products = product.objects.all()
+            prods_id = [i.id for i in products]
+            for i in range(1,1001):
+                if i not in prods_id:
+                    new_id = i
+                    break
 
-        if form.is_valid():
-            prod = product()
-            prod.id=new_id
-            prod.name=form.cleaned_data.get('name')
-            prod.weight=form.cleaned_data.get('weight')
-            prod.calories=form.cleaned_data.get('calories')
-            prod.price=form.cleaned_data.get('price')
-            prod.save()
-        else:
-            error = f'{form.cleaned_data.get("name")}\n{form.cleaned_data.get("weight")}\n{form.cleaned_data.get("calories")}\n{form.cleaned_data.get("price")}'
+            if form.is_valid():
+                prod = product()
+                prod.id=new_id
+                prod.name=form.cleaned_data.get('name')
+                prod.weight=form.cleaned_data.get('weight')
+                prod.calories=form.cleaned_data.get('calories')
+                prod.price=form.cleaned_data.get('price')
+                prod.save()
 
     form = ProductForm
     context={'form': form, 'error': error}

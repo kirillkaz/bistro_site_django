@@ -79,7 +79,6 @@ def LoadMakeFinallyReportPage(request):
         record = {'record': i, 'dish_price': round(i.price/i.count, 2)}
         daily_reports_with_dishprices.append(record)
 
-    message = f'{days_results[0].date} {daily_reports_with_dishprices[0]["record"].date}'
     context = {'days_results': days_results, 'cur_year_results': cur_year_results, 'daily_reports_with_dishprices': daily_reports_with_dishprices, 'cur_year': cur_year, 'actually_daily_reports_results': actually_daily_reports_results}
     return render(request, 'main_app/FinallyReportPath/look_finallyreport.html', context)
 

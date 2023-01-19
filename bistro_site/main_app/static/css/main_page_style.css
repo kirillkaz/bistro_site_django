@@ -167,11 +167,15 @@ body {
     display: none;
 }
 
+.hidden{
+    display:none;
+}
+
 .input_field-img-icon{
     transition: 0.2s;
     opacity: 0.25;
-    width: 2000px;
-    height: 2000px;
+    width: 200px;
+    height: 200px;
 }
 
 .table_img{
@@ -337,7 +341,7 @@ table .save{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -351,7 +355,7 @@ table .save:hover{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -364,7 +368,7 @@ table .save:active{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -378,7 +382,7 @@ table .reset{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -392,7 +396,7 @@ table .reset:hover{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -405,7 +409,7 @@ table .reset:active{
     font-family: 'Montserrat', 'Arial';
     font-size: 18px;
     width: 85%;
-    height: 70%;
+    height: 40px;
     padding: 10px;
     line-height: 0em;
 }
@@ -517,10 +521,6 @@ table .reset:active{
     width: 33.33%;
     height: 100%;
     padding: 10px; 
-}
-
-.hidden{
-    display:none;
 }
 
 input[type=number]::-webkit-inner-spin-button,

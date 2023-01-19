@@ -63,7 +63,7 @@
 				    {%endif%}
                                 {%endfor%}
                             </td>
-                            <td><img class="table_img" src={{i.img.url}}></td>
+			    <td><img class="table_img" src="/{{i.img}}"></td>
 			    {%if request.user.position == "Шеф-повар"%}
                             <td class="last_td">
 				<a href="http://146.185.240.26/hub/edit/dish?dishID={{i.id_id}}"><input type="button" class="save" value="редактировать"></a><br><br>

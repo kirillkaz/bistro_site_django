@@ -434,7 +434,7 @@ table .reset:active{
     flex-direction: row;
     justify-content: space-between;
     text-decoration: none;
-    margin-top: 8vh;
+    margin-top: 20px;
     width: 99%;
 }
 
@@ -443,7 +443,7 @@ table .reset:active{
     flex-direction: row;
     justify-content: center;
     text-decoration: none;
-    margin-top: 8vh;
+    margin-top: 20px;
     width: 100%;
 }
 

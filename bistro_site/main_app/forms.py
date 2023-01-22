@@ -24,9 +24,9 @@ class DishCompositionForm(forms.ModelForm):
 
 class ProductForm(forms.ModelForm):
     name = forms.CharField(label='Название продукта', widget=forms.TextInput(attrs={'placeholder': 'Название продукта', 'class': 'input_field'}))
-    weight = forms.IntegerField(label='Вес продукта', widget=forms.TextInput(attrs={'placeholder': 'Вес продукта', 'class': 'input_field'}))
-    calories = forms.IntegerField(label='Калорийность продукта', widget=forms.TextInput(attrs={'placeholder': 'Калорийность продукта', 'class': 'input_field'}))
-    price = forms.DecimalField(label='Цена продукта', widget=forms.TextInput(attrs={'placeholder': 'Цена продукта', 'class': 'input_field'}))
+    weight = forms.IntegerField(label='Вес продукта', widget=forms.TextInput(attrs={'placeholder': 'Вес продукта в граммах', 'class': 'input_field'}))
+    calories = forms.IntegerField(label='Калорийность продукта', widget=forms.TextInput(attrs={'placeholder': 'Калорийность продукта в Ккал', 'class': 'input_field'}))
+    price = forms.DecimalField(label='Цена продукта', widget=forms.TextInput(attrs={'placeholder': 'Цена продукта за кг', 'class': 'input_field'}))
 
     class Meta:
         model = product
@@ -35,7 +35,7 @@ class ProductForm(forms.ModelForm):
 
 class RecipeForm(forms.ModelForm):
     name = forms.CharField(label='Название рецепта', widget=forms.TextInput(attrs={'placeholder': 'Название рецепта', 'class': 'input_field'}))
-    cooking_time = forms.CharField(label='Время приготовления', widget=forms.TextInput(attrs={'placeholder': 'Время приготовления', 'class': 'input_field'}))
+    cooking_time = forms.CharField(label='Время приготовления', widget=forms.TextInput(attrs={'placeholder': 'Время приготовления в минутах', 'class': 'input_field'}))
     cooking_technology = forms.CharField(label='Технология приготовления', widget=forms.Textarea(attrs={'placeholder': 'Технология приготовления', 'class': 'input_field_area'}))
     
     class Meta:

@@ -35,7 +35,13 @@
 		<form method="post">
                     {% csrf_token %}
                     <div class="add_field">
-                        {{form.name}}
+			<!-- {{form.name}}-->
+			<select class="input_field" id="id_name" name="name">
+			<option>Название продукта</option>
+			{%for i in products%}
+			<option>{{i.name}}</option>
+			{%endfor%}
+			</select>
                     </div>
                     <div class="add_field">
                         {{form.product_count}}

@@ -302,9 +302,9 @@ def LoadAddDishcompositionPage(request):
                     new_dishcomposition.dish = editable_dish
                     new_dishcomposition.product = added_product
                     new_dishcomposition.save()
-
+    products = product.objects.all().order_by('name')
     form = DishCompositionForm
-    context={'form': form, 'error': error}
+    context={'form': form, 'error': error, 'products': products}
 
     return render(request, 'main_app/DishCompositionPath/add_dishcomposition.html', context)
 
